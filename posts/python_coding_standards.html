@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing High-Quality Python Code: Essential Standards and Guidelines</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="terminal-title">python_coding_standards.html</div>
+        </div>
+        <div class="terminal-content">
+            <nav class="terminal-nav">
+                <a href="../index.html">~/home</a>
+                <a href="../blog.html">~/blog</a>
+                <a href="../about.html">~/about</a>
+            </nav>
+
+            <div class="content">
+                <h1>Writing High-Quality Python Code: Essential Standards and Guidelines</h1>
+
+                <div class="project-section">
+                    <p>When working on Python projects, following a set of standardized guidelines can greatly improve code quality, readability, and maintainability. Whether you're scripting, building a library, or working on an application, these best practices will help you create cleaner, more efficient Python code.</p>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Python Version Compatibility</h2>
+                    <p>All code should be written in Python 3, with a minimum compatibility set to Python 3.7:</p>
+                    <ul>
+                        <li><strong>Avoid backward compatibility for Python 2</strong>: There's no need to make code compatible with Python 2 since it's no longer supported.</li>
+                        <li><strong>Library Development</strong>: Libraries should ensure compatibility with Python 3.7 or later, allowing downstream applications to rely on stable, lower versions when necessary.</li>
+                        <li><strong>Application Development</strong>: Applications are free to use any Python 3 version, as long as the dependencies align with it. For instance, if a feature requires Python 3.8, feel free to leverage it.</li>
+                        <li><strong>Testing for Libraries</strong>: Libraries should list supported Python versions and be tested in CI against each of these versions.</li>
+                        <li><strong>Testing for Applications</strong>: Applications should specify the required version and, optionally, test on newer versions as they become available.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Build System</h2>
+                    <p>For project setup, follow the <a href="https://www.python.org/dev/peps/pep-0518/" class="terminal-link">PEP 518</a> guidelines:</p>
+                    <ul>
+                        <li>Use <code>pyproject.toml</code> to define your build system requirements.</li>
+                        <li>With <code>setuptools</code>, leverage <code>setup.cfg</code> for metadata and dependency management.</li>
+                        <li>Optionally, include a basic <code>setup.py</code> file to support editable installs:</li>
+                    </ul>
+                    <div class="code-block" data-language="python">
+                        <pre><code>import setuptools
+
+if __name__ == "__main__":
+    setuptools.setup()</code></pre>
+                    </div>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Structuring Your Project</h2>
+                    <p>The general structure for any Python project, whether a library or application, should be simple yet effective:</p>
+                    
+                    <h3>Source Code Layout</h3>
+                    <p>Organize source code under a <code>src/</code> directory. For a project with multiple modules, this can look like:</p>
+                    <div class="code-block" data-language="text">
+                        <pre><code>src/
+  main_package/
+    __init__.py
+    module_one.py</code></pre>
+                    </div>
+
+                    <h3>Testing Layout</h3>
+                    <p>Place tests within a <code>tests/</code> directory, with subfolders mirroring the structure of the code they test:</p>
+                    <div class="code-block" data-language="text">
+                        <pre><code>tests/
+  test_main_package/
+    test_module_one.py</code></pre>
+                    </div>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Code Style Guidelines</h2>
+                    <p>Adhere to the <a href="https://www.python.org/dev/peps/pep-0008/" class="terminal-link">PEP 8 Style Guide</a> for consistency:</p>
+                    <ul>
+                        <li><strong>Formatting and Linting</strong>: Use tools like <code>black</code> for deterministic formatting and ensure compliance in CI.</li>
+                        <li><strong>Imports</strong>: Use the <a href="https://google.github.io/styleguide/pyguide.html#22-imports" class="terminal-link">Google import style</a>, which is compatible with PEP 8 and structures imports as:
+                            <ol>
+                                <li>Standard library imports</li>
+                                <li>Third-party imports</li>
+                                <li>Local imports (separate groups with a blank line)</li>
+                            </ol>
+                        </li>
+                        <li><strong>Variable Naming</strong>: Opt for descriptive names that make the code self-explanatory.</li>
+                        <li><strong>Avoid Commented-Out Code</strong>: Only include necessary code in patches or pull requests—avoid leaving in commented-out sections.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Type Annotations</h2>
+                    <p>For better readability and maintainability, all functions should include type hints for parameters and return values:</p>
+                    <ul>
+                        <li><strong>Type-Checking</strong>: Use <a href="http://www.mypy-lang.org/" class="terminal-link">mypy</a> in CI to validate type hints.</li>
+                        <li><strong>Void Functions</strong>: Include a return type of <code>-> None</code> if the function has no return value.</li>
+                        <li><strong>Library Type Information</strong>: Follow PEP 561 by including type information within packages and adding a <code>py.typed</code> marker file.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Documentation Standards</h2>
+                    <p>Documentation helps others understand and use your code effectively:</p>
+                    <ul>
+                        <li><strong>Function Docstrings</strong>: Include detailed explanations of parameters and return values.</li>
+                        <li><strong>Class Docstrings</strong>: Explain class purpose and usage, describing each field when appropriate.</li>
+                        <li><strong>Module-Level Documentation</strong>: At the top of each module, provide an overview of the contents and their intended usage.</li>
+                        <li><strong>Avoid Redundancies</strong>: Don't duplicate information (such as type hints) in docstrings, as this can become outdated.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Testing Guidelines</h2>
+                    <p>Quality code is well-tested. For Python projects, follow these testing practices:</p>
+                    <ul>
+                        <li><strong>Testing Framework</strong>: Use <a href="https://docs.pytest.org" class="terminal-link">pytest</a>.</li>
+                        <li><strong>Unit and Integration Tests</strong>: Unit tests should cover individual functions, while integration tests validate the interactions between modules.</li>
+                        <li><strong>Async Testing</strong>: If your code includes async functions, use the <a href="https://github.com/pytest-dev/pytest-asyncio" class="terminal-link">pytest-asyncio</a> plugin.</li>
+                        <li><strong>Coverage</strong>: Track code coverage with <a href="https://pytest-cov.readthedocs.io/en/latest/readme.html" class="terminal-link">pytest-cov</a> and aim to cover branches as well.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Setting Up a Testing Pipeline</h2>
+                    <p>Automating testing is crucial for consistency. Use <a href="https://tox.wiki/en/latest/" class="terminal-link">tox</a> to define and manage your testing environment:</p>
+                    <ul>
+                        <li><strong>Isolated Build Environments</strong>: Enable isolated builds by adding <code>isolated_build = true</code> to <code>tox.ini</code>.</li>
+                        <li><strong>Testing Stages</strong>:
+                            <ul>
+                                <li><strong>Code Formatting</strong>: <code>black</code></li>
+                                <li><strong>Documentation</strong>: <code>pydocstyle</code> and <code>darglint</code></li>
+                                <li><strong>Code Standards</strong>: <code>pylint</code></li>
+                                <li><strong>Type-Checking</strong>: <code>mypy</code></li>
+                                <li><strong>Dependency Testing</strong>: Run tests with minimum and latest dependency versions.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Defining and Running Applications</h2>
+                    <p>For applications, utilize entry points for easy execution:</p>
+
+                    <h3>Entry Point Configuration</h3>
+                    <p>Specify entry points in <code>setup.cfg</code> as:</p>
+                    <div class="code-block" data-language="ini">
+                        <pre><code>[options.entry_points]
+console_scripts =
+    my-app = my_package.__main__:main</code></pre>
+                    </div>
+
+                    <h3>Main Function</h3>
+                    <p>The <code>if __name__ == "__main__":</code> check should only call a non-async <code>main()</code> function, which launches async components if needed. This ensures co</p>
+                    <div class="code-block" data-language="python">
+                        <pre><code>async def run():
+    pass
+
+def main():
+    asyncio.run(run())
+
+if __name__ == "__main__":
+    main()</code></pre>
+                    </div>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Performance Profiling</h2>
+                    <p>When it comes to Python projects, testing performance can be just as crucial as ensuring functional correctness, especially for resource-intensive applications. By understanding where an application consumes CPU and memory resources, you can optimize and streamline your code, improve user experience, and reduce operational costs.</p>
+
+                    <h3>Why Performance Profiling Matters</h3>
+                    <p>Performance profiling helps detect inefficiencies in the code, uncovering functions or modules that consume disproportionate amounts of CPU or memory resources. By regularly profiling your Python applications or libraries, you can:</p>
+                    <ol>
+                        <li><strong>Enhance Efficiency:</strong> Eliminate bottlenecks and improve speed and response times.</li>
+                        <li><strong>Optimize Resource Usage:</strong> Reduce unnecessary memory usage and avoid CPU-intensive processes.</li>
+                        <li><strong>Improve Scalability:</strong> Ensure the code can handle higher loads or user requests.</li>
+                        <li><strong>Support Cost-Effectiveness:</strong> Efficient code may require fewer computational resources, lowering infrastructure expenses.</li>
+                    </ol>
+
+                    <h3>Types of Performance Profiling</h3>
+                    <p>The two primary categories of profiling are <strong>CPU profiling</strong> and <strong>memory profiling</strong>. Let's explore each in detail.</p>
+
+                    <h4>1. CPU Profiling</h4>
+                    <p>CPU profiling measures the time spent executing each part of the code. By identifying which functions are CPU-intensive, you can target specific areas for optimization.</p>
+
+                    <h5>Tools for CPU Profiling</h5>
+                    <ol>
+                        <li>
+                            <strong>cProfile</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: In-built profiler in Python, suitable for a general-purpose overview of where CPU time is spent.</li>
+                                <li><strong>Method</strong>: It provides an output that lists each function call, how often it was called, and how much time it took on average. You can run <code>cProfile</code> directly from the command line or embed it within your Python script.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>import cProfile
+import pstats
+
+def your_function():
+    # Code to profile
+    pass
+
+cProfile.run('your_function()', 'profile_output')
+p = pstats.Stats('profile_output')
+p.strip_dirs().sort_stats('time').print_stats(10)</code></pre>
+                            </div>
+                            <ul>
+                                <li><strong>Strengths</strong>: Simple to use and well-suited for profiling individual scripts.</li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <strong>pyinstrument</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: Ideal for analyzing high-level performance issues, showing a time breakdown for each function call.</li>
+                                <li><strong>Method</strong>: It generates a flame graph that displays the flow and duration of code execution, making it easier to spot functions with significant overhead.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>from pyinstrument import Profiler
+
+profiler = Profiler()
+profiler.start()
+# Code you want to profile
+profiler.stop()
+print(profiler.output_text(unicode=True, color=True))</code></pre>
+                            </div>
+                            <ul>
+                                <li><strong>Strengths</strong>: Provides an intuitive, easy-to-read breakdown and shows the call stack in a simplified visual format.</li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <strong>line_profiler</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: Focuses on profiling at the line level, showing which lines of code within a function are taking the most time.</li>
+                                <li><strong>Method</strong>: Install via <code>pip install line_profiler</code>, then decorate functions with <code>@profile</code> to inspect performance at a finer level.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>@profile
+def your_function():
+    # Code to profile line-by-line
+    pass</code></pre>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <h5>Tips for CPU Profiling</h5>
+                    <ul>
+                        <li><strong>Target Specific Code Blocks</strong>: Instead of profiling the entire application, focus on individual functions or methods that are computationally intensive.</li>
+                        <li><strong>Profile in Realistic Scenarios</strong>: Run the profiler under conditions that mimic typical usage, as the results will be more applicable for optimizations.</li>
+                        <li><strong>Use Flame Graphs</strong>: These visually represent CPU time and can quickly reveal functions with the highest execution costs.</li>
+                    </ul>
+
+                    <h4>2. Memory Profiling</h4>
+                    <p>Memory profiling identifies parts of the code consuming excessive memory, which is essential for applications that handle large datasets or perform in-memory computations.</p>
+
+                    <h5>Tools for Memory Profiling</h5>
+                    <ol>
+                        <li>
+                            <strong>memory_profiler</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: Great for analyzing memory consumption line-by-line, providing detailed insights into memory usage within specific functions.</li>
+                                <li><strong>Method</strong>: Install via <code>pip install memory-profiler</code>, then decorate functions with <code>@profile</code> to get memory usage breakdowns.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>from memory_profiler import profile
+
+@profile
+def your_function():
+    # Code you want to profile for memory
+    pass</code></pre>
+                            </div>
+                            <ul>
+                                <li><strong>Strengths</strong>: Line-by-line analysis makes it easy to identify where memory spikes occur.</li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <strong>objgraph</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: Useful for tracking memory leaks by identifying objects that increase memory usage unnecessarily.</li>
+                                <li><strong>Method</strong>: Visualizes object references, making it easy to track the root causes of memory consumption issues.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>import objgraph
+
+objgraph.show_growth()
+# Run your function
+objgraph.show_most_common_types()</code></pre>
+                            </div>
+                            <ul>
+                                <li><strong>Strengths</strong>: Helps to identify memory leaks by revealing object types that are increasing unexpectedly.</li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <strong>heapy (part of Guppy3)</strong>:
+                            <ul>
+                                <li><strong>Use Case</strong>: Offers in-depth memory analysis by showing the allocation of objects in memory, helping to find memory-intensive objects.</li>
+                                <li><strong>Method</strong>: <code>heapy</code> allows you to create snapshots of memory state to compare allocations over time.</li>
+                                <li><strong>Example Usage</strong>:</li>
+                            </ul>
+                            <div class="code-block" data-language="python">
+                                <pre><code>from guppy import hpy
+
+h = hpy()
+h.heap()  # Initial snapshot
+# Run your code
+h.heap()  # Post snapshot</code></pre>
+                            </div>
+                            <ul>
+                                <li><strong>Strengths</strong>: Enables comparisons of memory usage snapshots to detect leaks or inefficient memory allocations.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h5>Tips for Memory Profiling</h5>
+                    <ul>
+                        <li><strong>Regular Snapshots</strong>: Take memory snapshots at various stages in your code to see how memory usage changes over time.</li>
+                        <li><strong>Monitor Object Growth</strong>: Use tools like <code>objgraph</code> to observe if certain objects persist or grow in size unexpectedly, indicating potential memory leaks.</li>
+                        <li><strong>Optimize Data Structures</strong>: Consider replacing memory-intensive data structures (like lists of dictionaries) with more efficient alternatives (such as Pandas DataFrames or arrays).</li>
+                    </ul>
+
+                    <h3>Best Practices for Performance Profiling</h3>
+                    <ol>
+                        <li><strong>Set Up Automated Profiling</strong>: Integrate profiling into CI/CD pipelines for regular feedback on performance impacts of code changes.</li>
+                        <li><strong>Analyze Results and Act</strong>: After profiling, consider restructuring code, optimizing algorithms, or using efficient libraries to reduce resource usage.</li>
+                        <li><strong>Document and Track</strong>: Keep records of profiling data, especially for frequently executed functions, so you can track improvements or regressions over time.</li>
+                        <li><strong>Optimize Iteratively</strong>: Make incremental improvements rather than overhauling large parts of code at once, which makes it easier to pinpoint gains and losses.</li>
+                    </ol>
+
+                    <h3>Example Workflow for Profiling</h3>
+                    <p>To help you get started, here's a sample workflow:</p>
+                    <ol>
+                        <li><strong>Identify Hotspots</strong>: Begin with <code>cProfile</code> or <code>pyinstrument</code> for high-level CPU analysis.</li>
+                        <li><strong>Drill Down</strong>: Use <code>line_profiler</code> for specific, time-intensive functions identified in the previous step.</li>
+                        <li><strong>Memory Analysis</strong>: Run <code>memory_profiler</code> and <code>objgraph</code> on memory-intensive sections to locate excessive memory usage.</li>
+                        <li><strong>Continuous Improvement</strong>: Regularly revisit performance as code evolves, using profiling to guide optimizations for new features or updates.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html> 

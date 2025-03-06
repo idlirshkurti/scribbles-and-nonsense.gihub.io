@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPMM - Project Details</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="terminal-title">dpmm_project.txt</div>
+        </div>
+        <div class="terminal-content">
+            <nav class="terminal-nav">
+                <a href="../index.html">~/home</a>
+                <a href="../projects.html">~/projects</a>
+                <a href="../blog.html">~/blog</a>
+            </nav>
+            <div class="content">
+                <div class="typing-effect">
+                    <h1>Dirichlet Process Mixture Modelling of False Discovery Rates</h1>
+                    <p class="project-tech">Python | Statistics | Machine Learning | Mathematics</p>
+                    
+                    <h2 class="section-header">Introduction to False Discovery Rates</h2>
+                    <div class="section-content">
+                        <p>In hypothesis testing, <strong>False Discovery Rate (FDR)</strong> refers to the proportion of false positives among all the hypotheses rejected. This concept becomes critical when we conduct multiple hypothesis tests, where controlling the probability of making a Type I error (a false positive) across all tests is necessary.</p>
+                        
+                        <div class="math-block">
+                            <p>The classical FDR formula:</p>
+                            \[
+                            FDR = \mathbb{E} \left( \frac{V}{R} \Big| R > 0 \right) \times P(R > 0)
+                            \]
+                            <p>Where:</p>
+                            <ul>
+                                <li>\( V \) is the number of false rejections (false positives)</li>
+                                <li>\( R \) is the total number of rejections (true positives + false positives)</li>
+                            </ul>
+                        </div>
+
+                        <p>The <strong>Positive False Discovery Rate (pFDR)</strong>, proposed by Storey, modifies the FDR formula to remove the dependence on \( P(R > 0) \), leading to a more refined and practically useful measure.</p>
+
+                        <p>Traditionally, methods like the Benjamini-Hochberg procedure provide a frequentist approach to controlling the FDR, but these methods assume a specific structure in the underlying distribution of p-values. <strong>Bayesian nonparametric approaches</strong>, such as Dirichlet Process Mixture Models (DPMMs), offer a more flexible and powerful solution, especially when data are complex and the true distribution of p-values is unknown.</p>
+                    </div>
+
+                    <h2 class="section-header">Bayesian Nonparametric Modelling Using Dirichlet Process Mixture Models (DPMMs)</h2>
+                    <div class="section-content">
+                        <p>A <strong>Dirichlet Process Mixture Model (DPMM)</strong> is a type of Bayesian nonparametric model used to infer distributions in an unknown mixture of data. We model the distribution of p-values using a mixture of a <strong>uniform distribution</strong> (representing p-values from true null hypotheses) and a <strong>Beta distribution</strong> (representing p-values from false null hypotheses).</p>
+
+                        <h3>How DPMMs Work</h3>
+                        <p>The Dirichlet process \(DP(\alpha, H)\) is a stochastic process where \( H \) is the base distribution (the prior) and \( \alpha \) is the concentration parameter controlling how many clusters we expect in the data. A Dirichlet process generates a discrete distribution, which can be used to model the clustering of p-values into groups that share common statistical properties.</p>
+
+                        <div class="math-block">
+                            <p>The mixture model for each p-value \( X_i \):</p>
+                            \[
+                            X_i \sim \pi_0 \cdot U(0, 1) + \pi_1 \cdot Beta(a, b)
+                            \]
+                            <p>Where:</p>
+                            <ul>
+                                <li>\( \pi_0 \) is the proportion of true null hypotheses</li>
+                                <li>\( \pi_1 \) is the proportion of false null hypotheses</li>
+                                <li>\( Beta(a, b) \) models p-values under the alternative hypothesis</li>
+                            </ul>
+                        </div>
+
+                        <h3>Dirichlet Process Clustering</h3>
+                        <p>The Dirichlet process allows for a flexible clustering of p-values into different groups, where each group corresponds to a different distribution of p-values. New clusters can be created dynamically as more data are observed, allowing the model to adapt without needing to specify the number of components ahead of time.</p>
+
+                        <div class="math-block">
+                            <p>Cluster assignment probabilities:</p>
+                            \[
+                            P(X_i \in \text{new cluster}) = \frac{\alpha}{\alpha + N}
+                            \]
+                            \[
+                            P(X_i \in \text{existing cluster}) = \frac{n_j}{\alpha + N}
+                            \]
+                            <p>Where:</p>
+                            <ul>
+                                <li>\( N \) is the total number of data points</li>
+                                <li>\( n_j \) is the number of points in cluster \( j \)</li>
+                                <li>\( \alpha \) is the concentration parameter</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="section-header">Posterior Sampling with DPMMs</h2>
+                    <div class="section-content">
+                        <p>Posterior inference in DPMMs is typically performed using <strong>Markov Chain Monte Carlo (MCMC)</strong> methods. The two primary algorithms I implemented were the <strong>No-Gaps Algorithm</strong> and <strong>Neal's Algorithm 8</strong>, which are Gibbs samplers tailored to Dirichlet processes. Both algorithms sample from the posterior distribution of the model parameters and the cluster assignments, allowing us to estimate the proportion of true null hypotheses (\( \pi_0 \)) and control the false discovery rate.</p>
+                    </div>
+
+                    <h2 class="section-header">Implementation Algorithms</h2>
+                    <div class="section-content">
+                        <h3>No-Gaps Algorithm</h3>
+                        <div class="algorithm-block">
+                            <div class="algorithm-title">Algorithm 1: No-Gaps DPMM</div>
+                            <div class="step">Initialize:
+                                <div class="substep">Input: \( X = \{x_1, \ldots, x_n\} \) - set of p-values</div>
+                                <div class="substep">Parameters: \( \alpha \) - concentration parameter</div>
+                                <div class="substep">Set \( c_i = 0 \) for all \( i \)</div>
+                                <div class="substep">Initialize \( \theta_k = (\alpha_k, \beta_k) \) from prior</div>
+                            </div>
+                            <div class="step">For each iteration \( t = 1, \ldots, T \):
+                                <div class="substep">For each data point \( x_i \):
+                                    <div class="math">
+                                        1. Remove \( x_i \) from cluster \( c_i \):<br>
+                                        \[ m_{c_i} \leftarrow m_{c_i} - 1 \]
+                                        2. If \( m_{c_i} = 0 \), remove cluster and adjust indices:<br>
+                                        \[ c_j \leftarrow c_j - 1 \quad \forall j: c_j > c_i \]
+                                        3. Calculate probabilities for each cluster \( k \):<br>
+                                        \[ P(c_i = k | x_i, \theta_k) \propto m_k \cdot \text{Beta}(x_i | \alpha_k, \beta_k) \]
+                                        4. Calculate probability for new cluster:<br>
+                                        \[ P(c_i = \text{new}) \propto \alpha \cdot \text{Uniform}(x_i) \]
+                                    </div>
+                                </div>
+                                <div class="substep">Update cluster parameters using MLE:
+                                    <div class="math">
+                                        For each cluster \( k \):<br>
+                                        \[ \alpha_k = \mu_k \cdot 10, \quad \beta_k = (1 - \mu_k) \cdot 10 \]
+                                        where \( \mu_k \) is the mean of points in cluster \( k \)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-block" data-language="python">
+                            <pre><code>def dirichlet_process_no_gaps(
+    data: np.ndarray,
+    iterations: int,
+    alpha: float,
+    initial_clusters: int = 1
+) -> Tuple[np.ndarray, List[Tuple[float, float]]]:
+    """
+    Dirichlet Process No-Gaps algorithm for clustering p-values.
+    
+    Args:
+        data: Array of p-values to cluster
+        iterations: Number of Gibbs sampling iterations
+        alpha: Concentration parameter
+        initial_clusters: Initial number of clusters
+    
+    Returns:
+        Tuple containing:
+        - Array of cluster assignments
+        - List of cluster parameters (alpha, beta)
+    """
+    if iterations <= 0:
+        raise ValueError("The number of iterations must be positive.")
+    if alpha <= 0:
+        raise ValueError("Alpha must be a positive value.")
+
+    n = len(data)
+    clusters = np.zeros(n, dtype=int)
+    cluster_params = []
+
+    # Initialize clusters
+    for _ in range(initial_clusters):
+        cluster_params.append((np.random.rand(), np.random.rand()))
+
+    for _ in range(iterations):
+        # Sample new clusters
+        for i in range(n):
+            current_cluster = int(clusters[i])
+            cluster_counts = np.bincount(clusters, 
+                                      minlength=len(cluster_params))
+
+            # Remove point from current cluster
+            cluster_counts[current_cluster] -= 1
+
+            # Remove empty clusters
+            if cluster_counts[current_cluster] == 0:
+                cluster_params.pop(current_cluster)
+                clusters[clusters > current_cluster] -= 1
+                cluster_counts = np.bincount(clusters, 
+                                          minlength=len(cluster_params))
+
+            # Calculate probabilities
+            probabilities = []
+            for j, (a, b) in enumerate(cluster_params):
+                p = beta.pdf(data[i], a, b)
+                probabilities.append(cluster_counts[j] * p)
+
+            # Add probability for new cluster
+            new_cluster_prob = alpha * uniform.pdf(data[i], 0, 1)
+            probabilities.append(new_cluster_prob)
+
+            # Sample new cluster
+            probabilities = np.array(probabilities)
+            probabilities /= probabilities.sum()
+            new_cluster = np.random.choice(len(probabilities), 
+                                         p=probabilities)
+
+            if new_cluster == len(cluster_params):
+                cluster_params.append((np.random.rand(), np.random.rand()))
+
+            clusters[i] = new_cluster
+
+        # Update parameters
+        for j in range(len(cluster_params)):
+            points_in_cluster = data[clusters == j]
+            if len(points_in_cluster) > 0:
+                a_new = np.mean(points_in_cluster) * 10
+                b_new = (1 - np.mean(points_in_cluster)) * 10
+                cluster_params[j] = (a_new, b_new)
+
+    return clusters, cluster_params</code></pre>
+                        </div>
+
+                        <h3>Neal's Algorithm 8</h3>
+                        <div class="algorithm-block">
+                            <div class="algorithm-title">Algorithm 2: Neal's Algorithm 8</div>
+                            <div class="step">Initialize:
+                                <div class="substep">Input: \( X = \{x_1, \ldots, x_n\} \) - set of p-values</div>
+                                <div class="substep">Parameters: \( \alpha \) - concentration parameter, \( l \) - number of auxiliary parameters</div>
+                                <div class="substep">Set \( c_i = 0 \) for all \( i \)</div>
+                                <div class="substep">Initialize \( \theta_k = (\alpha_k, \beta_k) \) from prior</div>
+                            </div>
+                            <div class="step">For each iteration \( t = 1, \ldots, T \):
+                                <div class="substep">For each data point \( x_i \):
+                                    <div class="math">
+                                        1. Remove \( x_i \) from current cluster<br>
+                                        2. Generate \( l \) auxiliary parameters \( \theta_{\text{aux}} \)<br>
+                                        3. Calculate probabilities:<br>
+                                        For existing clusters:<br>
+                                        \[ P(c_i = k | x_i, \theta_k) \propto m_k \cdot \text{Beta}(x_i | \alpha_k, \beta_k) \]
+                                        For auxiliary parameters:<br>
+                                        \[ P(c_i = \text{new} | x_i, \theta_{\text{aux}}) \propto \frac{\alpha}{l} \cdot \text{Beta}(x_i | \alpha_{\text{aux}}, \beta_{\text{aux}}) \]
+                                    </div>
+                                </div>
+                                <div class="substep">Update cluster parameters:
+                                    <div class="math">
+                                        For each cluster \( k \):<br>
+                                        \[ \alpha_k = \mu_k \cdot 10, \quad \beta_k = (1 - \mu_k) \cdot 10 \]
+                                        where \( \mu_k \) is the mean of points in cluster \( k \)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-block" data-language="python">
+                        <pre><code>def neal_algorithm_8(
+    data: np.ndarray,
+    iterations: int,
+    alpha: float,
+    auxiliary_params: int = 3
+) -> Tuple[np.ndarray, List[Tuple[float, float]]]:
+    """
+    Neal's Algorithm 8 for Dirichlet Process Mixture Models.
+
+    This algorithm uses auxiliary parameters to improve mixing in the MCMC sampling,
+    making it more efficient than the No-Gaps algorithm for large datasets.
+
+    Args:
+        data: Array of p-values to cluster
+        iterations: Number of Gibbs sampling iterations
+        alpha: Concentration parameter of the Dirichlet Process
+        auxiliary_params: Number of auxiliary parameters to use (default: 3)
+
+    Returns:
+        Tuple containing:
+        - Array of cluster assignments
+        - List of cluster parameters (alpha, beta)
+
+    Raises:
+        ValueError: If iterations <= 0 or alpha <= 0
+    """
+    if iterations <= 0:
+        raise ValueError("The number of iterations must be positive.")
+    if alpha <= 0:
+        raise ValueError("Alpha must be a positive value.")
+
+    n = len(data)
+    clusters = np.zeros(n, dtype=int)
+    cluster_params: List[Tuple[float, float]] = []
+
+    # Initialize with auxiliary parameters
+    for _ in range(auxiliary_params):
+        cluster_params.append((np.random.rand(), np.random.rand()))
+
+    for _ in range(iterations):
+        for i in range(n):
+            current_cluster = int(clusters[i])
+            cluster_counts = np.bincount(clusters, 
+                                      minlength=len(cluster_params))
+
+            # Remove point from current cluster
+            cluster_counts[current_cluster] -= 1
+
+            # Remove empty clusters and adjust indices
+            if cluster_counts[current_cluster] == 0:
+                cluster_params.pop(current_cluster)
+                clusters[clusters > current_cluster] -= 1
+                cluster_counts = np.bincount(clusters, 
+                                          minlength=len(cluster_params))
+
+            # Generate auxiliary parameters
+            aux_params = [(np.random.rand(), np.random.rand()) 
+                         for _ in range(auxiliary_params)]
+            cluster_params.extend(aux_params)
+
+            # Calculate probabilities for existing clusters
+            probabilities = []
+            for j, (a, b) in enumerate(cluster_params):
+                p = beta.pdf(data[i], a, b)
+                probabilities.append(cluster_counts[j] * p)
+
+            # Calculate probabilities for auxiliary parameters
+            aux_prob = alpha / auxiliary_params * uniform.pdf(data[i], 0, 1)
+            probabilities.append(aux_prob)
+
+            # Sample new cluster assignment
+            probabilities = np.array(probabilities)
+            probabilities /= probabilities.sum()
+            new_cluster = np.random.choice(len(probabilities), 
+                                         p=probabilities)
+
+            # Handle new cluster creation
+            if new_cluster >= len(cluster_params) - auxiliary_params:
+                new_cluster = len(cluster_params) - auxiliary_params + new_cluster
+                cluster_params.pop(new_cluster)
+
+            clusters[i] = new_cluster
+
+        # Update cluster parameters using MLE
+        for j in range(len(cluster_params)):
+            points_in_cluster = data[clusters == j]
+            if len(points_in_cluster) > 0:
+                # Update Beta distribution parameters
+                a_new = np.mean(points_in_cluster) * 10
+                b_new = (1 - np.mean(points_in_cluster)) * 10
+                cluster_params[j] = (a_new, b_new)
+
+    return clusters, cluster_params</code></pre>
+                    </div>
+
+                    <h2 class="section-header">Performance Evaluation</h2>
+                    <div class="section-content">
+                        <p>To thoroughly evaluate the effectiveness of <strong>Dirichlet Process Mixture Models (DPMMs)</strong> for controlling the false discovery rate (FDR), I implemented both the <strong>No-Gaps Algorithm</strong> and <strong>Neal's Algorithm 8</strong>. The performance of these algorithms was tested on both synthetic datasets and real-world data (specifically, gene expression data from the leukemia microarray study). Below is a detailed analysis of their performance in terms of clustering accuracy, convergence speed, and computational efficiency.</p>
+
+                        <h3>1. Accuracy of Clustering and Estimation of \( \pi_1 \)</h3>
+                        
+                        <h4>Synthetic Data Experiments</h4>
+                        <p>In order to assess how well DPMMs can model p-value distributions, I conducted experiments on synthetic datasets. The synthetic datasets consisted of p-values generated from both uniform distributions (representing true null hypotheses) and Beta distributions (representing false null hypotheses). By varying the parameters of the Beta distributions, I created different levels of difficulty in separating the clusters of p-values.</p>
+
+                        <p>For example, I simulated datasets with 30% false null hypotheses by drawing p-values from a \( Beta(0.1, 6.1) \) distribution and true nulls from a uniform \( U(0, 1) \) distribution. The goal was to see how well the DPMM algorithms could recover the true proportion of false null hypotheses (\( \pi_1 \)) and accurately model the underlying mixture of distributions.</p>
+
+                        <p>The following plot shows the cluster allocations for the synthetically generated p-values using:</p>
+                        <div class="code-block" data-language="python">
+                            <pre><code>np.random.seed(42)
+data = np.concatenate([beta.rvs(0.1, 2, size=50), uniform.rvs(size=50)])</code></pre>
+                        </div>
+
+                        <div class="visualization">
+                            <img src="../plots/clusters_pvalues.png" alt="P-value Clusters" class="project-image">
+                            <p class="image-caption">Cluster allocations for synthetically generated p-values</p>
+                        </div>
+
+                        <div class="visualization">
+                            <img src="../plots/beta_clusters.png" alt="Beta Clusters" class="project-image">
+                            <p class="image-caption">Beta distribution for each cluster</p>
+                        </div>
+
+                        <h4>Results: Posterior Distribution of \( \pi_1 \)</h4>
+                        <p>Both algorithms successfully clustered the p-values into two distinct groups corresponding to the null and alternative hypotheses. The <strong>No-Gaps Algorithm</strong> performed well but had slightly more variance in estimating \( \pi_1 \), while <strong>Neal's Algorithm 8</strong> consistently converged faster and produced tighter posterior estimates of \( \pi_1 \).</p>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>True \(\pi_1\)</th>
+                                    <th>Estimated \(\pi_1\)</th>
+                                    <th>Variance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No-Gaps Algorithm</td>
+                                    <td class="numeric">0.30</td>
+                                    <td class="numeric">0.28</td>
+                                    <td class="numeric">0.04</td>
+                                </tr>
+                                <tr>
+                                    <td>Neal's Algorithm 8</td>
+                                    <td class="numeric">0.30</td>
+                                    <td class="numeric">0.29</td>
+                                    <td class="numeric">0.02</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Gene Expression Data</h4>
+                        <p>I also tested the algorithms on real-world data, specifically the leukemia gene expression dataset, which contains over 3000 genes and their corresponding p-values derived from hypothesis tests comparing two tumor classes. This dataset is representative of high-dimensional testing problems where thousands of hypotheses are tested simultaneously.</p>
+
+                        <p>For this dataset, the true distribution of p-values is unknown, making it a more challenging and realistic application for DPMMs. The p-values under the null hypothesis are expected to follow a uniform distribution, while those under the alternative hypothesis may follow a more complex distribution, possibly resembling a Beta distribution due to the skewness often observed in alternative p-values.</p>
+
+                        <p>Both algorithms were able to estimate the proportion of true null hypotheses (\( \pi_0 \)) effectively. The <strong>frequentist approach</strong> (Storey's method) estimated \( \pi_0 \) at 0.488, while both Bayesian methods provided similar estimates, albeit slightly more conservative.</p>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Estimated \(\pi_0\)</th>
+                                    <th>Estimated pFDR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Frequentist (Storey)</td>
+                                    <td class="numeric">0.488</td>
+                                    <td class="numeric">0.087</td>
+                                </tr>
+                                <tr>
+                                    <td>No-Gaps Algorithm</td>
+                                    <td class="numeric">0.384</td>
+                                    <td class="numeric">0.102</td>
+                                </tr>
+                                <tr>
+                                    <td>Neal's Algorithm 8</td>
+                                    <td class="numeric">0.379</td>
+                                    <td class="numeric">0.111</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>2. Convergence Speed and Computational Efficiency</h3>
+                        <p>Convergence speed is a critical factor in choosing between different algorithms, especially for large-scale applications like genomic studies. To compare the performance of the <strong>No-Gaps Algorithm</strong> and <strong>Neal's Algorithm 8</strong>, I tracked the number of iterations required for each algorithm to converge (i.e., when parameter estimates stabilized) and the overall computational time.</p>
+
+                        <h4>Synthetic Data (1,000 Observations)</h4>
+                        <p>In synthetic datasets with 1,000 observations, both algorithms were able to model the p-value distribution accurately. However, <strong>Neal's Algorithm 8</strong> converged significantly faster than the No-Gaps Algorithm. This is due to Neal's use of auxiliary parameters, which improves the algorithm's ability to mix between clusters.</p>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Convergence (Iterations)</th>
+                                    <th>Total Time (Minutes)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No-Gaps Algorithm</td>
+                                    <td class="numeric">15,000</td>
+                                    <td class="numeric">6.37</td>
+                                </tr>
+                                <tr>
+                                    <td>Neal's Algorithm 8</td>
+                                    <td class="numeric">10,000</td>
+                                    <td class="numeric">6.97</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Although Neal's Algorithm 8 required slightly more time per iteration due to the additional auxiliary variables, it converged faster in terms of the number of iterations. This made it more efficient overall, particularly for large datasets.</p>
+
+                        <h4>Gene Expression Data (3,051 Genes)</h4>
+                        <p>When applied to the gene expression dataset, Neal's Algorithm 8 again outperformed the No-Gaps Algorithm in terms of convergence speed. This is critical in practical applications, where running time can be a bottleneck due to the large size of datasets.</p>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Convergence (Iterations)</th>
+                                    <th>Total Time (Minutes)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No-Gaps Algorithm</td>
+                                    <td class="numeric">20,000</td>
+                                    <td class="numeric">12.45</td>
+                                </tr>
+                                <tr>
+                                    <td>Neal's Algorithm 8</td>
+                                    <td class="numeric">12,000</td>
+                                    <td class="numeric">11.15</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Neal's Algorithm 8 converged approximately 40% faster than the No-Gaps Algorithm for this dataset. Its ability to efficiently explore the parameter space made it more suitable for large-scale problems. However, it's worth noting that the computational cost of Neal's Algorithm 8 scales with the number of auxiliary parameters, so there is a trade-off between convergence speed and computational time per iteration.</p>
+
+                        <h3>3. Bayesian vs. Frequentist pFDR Estimation</h3>
+                        <p>An important aspect of the performance evaluation was the comparison of <strong>Bayesian pFDR estimates</strong> with traditional <strong>frequentist pFDR</strong> estimates. The Bayesian methods, by modeling the distribution of p-values more flexibly, provided <strong>better control of the false discovery rate</strong> in high-dimensional settings.</p>
+
+                        <p>For smaller datasets (e.g., with 100 p-values), both the Bayesian and frequentist methods produced similar pFDR estimates. However, as the sample size increased, the <strong>Bayesian estimates outperformed the frequentist estimates</strong> in terms of accuracy.</p>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Sample Size</th>
+                                    <th>True pFDR</th>
+                                    <th>Frequentist pFDR</th>
+                                    <th>Bayesian pFDR (No-Gaps)</th>
+                                    <th>Bayesian pFDR (Neal's)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="numeric">100</td>
+                                    <td class="numeric">0.192</td>
+                                    <td class="numeric">0.213</td>
+                                    <td class="numeric">0.201</td>
+                                    <td class="numeric">0.199</td>
+                                </tr>
+                                <tr>
+                                    <td class="numeric">1,000</td>
+                                    <td class="numeric">0.472</td>
+                                    <td class="numeric">0.489</td>
+                                    <td class="numeric">0.468</td>
+                                    <td class="numeric">0.467</td>
+                                </tr>
+                                <tr>
+                                    <td class="numeric">10,000</td>
+                                    <td class="numeric">0.562</td>
+                                    <td class="numeric">0.593</td>
+                                    <td class="numeric">0.553</td>
+                                    <td class="numeric">0.550</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>For larger sample sizes (1,000 or more p-values), the <strong>Bayesian methods provided closer estimates to the true pFDR</strong> compared to the frequentist approach. This suggests that the Bayesian approach, particularly with Neal's Algorithm 8, is better suited for large-scale testing environments, where frequentist methods might overestimate the false discovery rate.</p>
+
+                        <h3>4. Trade-offs Between Algorithms</h3>
+                        <p>In summary, the <strong>No-Gaps Algorithm</strong> is simpler and computationally less expensive per iteration, making it ideal for small-to-medium-sized datasets. However, its slower convergence means that it is less suitable for large-scale applications.</p>
+
+                        <p>On the other hand, <strong>Neal's Algorithm 8</strong> offers faster convergence and more precise parameter estimates, making it ideal for high-dimensional testing problems, albeit at a higher computational cost per iteration. In large datasets like those found in genomics, where thousands of hypotheses are tested simultaneously, Neal's Algorithm 8 proved to be the better choice.</p>
+                    </div>
+
+                    <h2 class="section-header">Conclusion</h2>
+                    <div class="section-content">
+                        <p>My research demonstrates the power and flexibility of <strong>Dirichlet Process Mixture Models (DPMMs)</strong> for controlling the false discovery rate in large-scale multiple hypothesis testing. The key advantages of DPMMs lie in their nonparametric nature, which allows them to handle complex, high-dimensional data without requiring prior knowledge of the underlying distribution.</p>
+
+                        <h3>No-Gaps Algorithm</h3>
+                        <p>The <strong>No-Gaps Algorithm</strong> is relatively simple to implement and computationally efficient, making it a good starting point for applying DPMMs to smaller datasets or when computational resources are limited. However, it is slower to converge when compared to more advanced methods.</p>
+
+                        <h3>Neal's Algorithm 8</h3>
+                        <p><strong>Neal's Algorithm 8</strong> proved to be more robust, with faster convergence due to the use of auxiliary variables. This makes it ideal for large datasets like those encountered in genomics, where thousands of hypotheses are tested simultaneously. Its flexibility and efficiency in clustering p-values make it a superior choice for high-dimensional multiple testing problems.</p>
+
+                        <p>Overall, Bayesian nonparametric approaches like DPMMs offer a valuable alternative to traditional frequentist methods, particularly in settings where the number of hypotheses is large, and the underlying data distribution is unknown.</p>
+
+                        <h3>Future Directions</h3>
+                        <p>Future work could explore the application of <strong>multi-stage testing procedures</strong> using DPMMs, which have been shown to improve the power of hypothesis tests while maintaining control over the FDR. Additionally, the potential of applying DPMMs in other fields of research—such as neuroscience and economics—where large-scale hypothesis testing is common, remains an exciting avenue for further exploration.</p>
+                    </div>
+
+                    <h2 class="section-header">References</h2>
+                    <div class="references">
+                        <ol>
+                            <li>Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. Journal of the Royal Statistical Society: Series B (Methodological), 57(1), 289-300.</li>
+                            <li>Storey, J. D. (2002). A direct approach to false discovery rates. Journal of the Royal Statistical Society: Series B (Methodological), 64(3), 479-498.</li>
+                            <li>Neal, R. M. (2000). Markov Chain Sampling Methods for Dirichlet Process Mixture Models. Journal of Computational and Graphical Statistics, 9(2), 249-265.</li>
+                            <li>MacEachern, S. N., & Müller, P. (1998). Estimating mixture of Dirichlet process models. Journal of Computational and Graphical Statistics, 7(2), 223-238.</li>
+                            <li>Tang, W., MacEachern, S. N., & Wolfe, P. (2005). Dirichlet process mixture models for multiple testing under dependence. Journal of the American Statistical Association, 100(469), 148-160.</li>
+                            <li>Ferguson, T. S. (1973). A Bayesian analysis of some nonparametric problems. The Annals of Statistics, 1(2), 209-230.</li>
+                        </ol>
+                    </div>
+
+                    <div class="project-links">
+                        <a href="#" class="terminal-link">[GitHub]</a>
+                        <a href="#" class="terminal-link">[Documentation]</a>
+                        <a href="#" class="terminal-link">[Paper]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html> 

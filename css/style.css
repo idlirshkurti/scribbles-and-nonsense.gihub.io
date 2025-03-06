@@ -1,0 +1,607 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #FFFFFF;
+    --accent-color: #CCCCCC;
+    --terminal-header: #1A1A1A;
+    --font-mono: 'Courier New', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.terminal {
+    background-color: var(--bg-color);
+    border: 2px solid var(--text-color);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
+}
+
+.terminal-header {
+    background-color: var(--terminal-header);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 20px;
+}
+
+.terminal-buttons span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    opacity: 0.5;
+}
+
+.terminal-title {
+    color: var(--text-color);
+    font-size: 0.9em;
+}
+
+.terminal-content {
+    padding: 20px;
+}
+
+.terminal-nav {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.terminal-nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+}
+
+.terminal-nav a:hover,
+.terminal-nav a.active {
+    border-color: var(--text-color);
+}
+
+.content {
+    padding: 20px 0;
+}
+
+.command {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+h1, h2 {
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.about-content {
+    margin: 20px 0;
+}
+
+ul {
+    list-style-type: none;
+    margin-left: 20px;
+}
+
+ul li::before {
+    content: ">";
+    color: var(--accent-color);
+    margin-right: 10px;
+}
+
+.project-grid {
+    display: grid;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.project-card {
+    border: 1px solid var(--text-color);
+    padding: 20px;
+    background-color: rgba(51, 255, 51, 0.05);
+}
+
+.project-tech {
+    color: var(--accent-color);
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.project-links {
+    margin-top: 20px;
+}
+
+.terminal-link {
+    color: var(--text-color);
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.terminal-link:hover {
+    color: var(--accent-color);
+}
+
+.blog-post {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.post-meta {
+    font-size: 0.9em;
+    color: var(--accent-color);
+    margin-bottom: 15px;
+}
+
+.post-meta span {
+    margin-right: 20px;
+}
+
+/* Typing effect animation */
+.typing-effect {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .terminal-content {
+        padding: 15px;
+    }
+    
+    .terminal-nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Project details page styles */
+.project-section {
+    margin: 30px 0;
+}
+
+.section-content {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+h3 {
+    color: var(--accent-color);
+    margin: 20px 0 10px;
+}
+
+/* Blog post styles */
+.blog-post-full {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.blog-post-full h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.blog-post-full .post-meta {
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.post-section {
+    margin: 40px 0;
+}
+
+.post-section h2 {
+    color: var(--accent-color);
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.post-footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--accent-color);
+}
+
+.share-links {
+    margin-top: 15px;
+}
+
+/* Ordered list styles */
+ol {
+    list-style-type: none;
+    counter-reset: item;
+    margin-left: 20px;
+}
+
+ol li {
+    counter-increment: item;
+    margin-bottom: 10px;
+}
+
+ol li::before {
+    content: counter(item) ">";
+    color: var(--accent-color);
+    margin-right: 10px;
+}
+
+.reading-time {
+    font-style: italic;
+}
+
+/* Code block styles */
+pre {
+    background-color: rgba(51, 255, 51, 0.1);
+    padding: 15px;
+    border: 1px solid var(--accent-color);
+    margin: 15px 0;
+    overflow-x: auto;
+}
+
+code {
+    font-family: var(--font-mono);
+    color: var(--text-color);
+}
+
+/* Project visualization styles */
+.visualization {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.project-image {
+    max-width: 80%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    border: 1px solid var(--accent-color);
+    padding: 10px;
+    background-color: rgba(51, 255, 51, 0.05);
+}
+
+.image-caption {
+    margin-top: 10px;
+    color: var(--accent-color);
+    font-size: 0.9em;
+    text-align: center;
+}
+
+/* Math and code styles */
+pre {
+    background-color: rgba(51, 255, 51, 0.1);
+    padding: 15px;
+    border: 1px solid var(--accent-color);
+    margin: 15px 0;
+    overflow-x: auto;
+}
+
+code {
+    font-family: var(--font-mono);
+    color: var(--text-color);
+}
+
+.MathJax {
+    color: var(--text-color) !important;
+}
+
+.math-block {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: rgba(51, 255, 51, 0.05);
+    border: 1px solid var(--accent-color);
+}
+
+.section-header {
+    color: var(--text-color);
+    font-size: 1.5em;
+    margin: 40px 0 20px;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 10px;
+}
+
+/* Mathematical Algorithm Display */
+.algorithm-block {
+    margin: 30px 0;
+    padding: 25px;
+    background-color: rgba(51, 255, 51, 0.05);
+    border: 1px solid var(--accent-color);
+    font-family: var(--font-mono);
+}
+
+.algorithm-block .algorithm-title {
+    color: var(--accent-color);
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 10px;
+}
+
+.algorithm-block .step {
+    margin: 15px 0;
+    padding-left: 25px;
+    position: relative;
+}
+
+.algorithm-block .step::before {
+    content: "▶";
+    color: var(--accent-color);
+    position: absolute;
+    left: 0;
+}
+
+.algorithm-block .substep {
+    margin: 10px 0 10px 20px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.algorithm-block .substep::before {
+    content: "→";
+    color: var(--accent-color);
+    position: absolute;
+    left: 0;
+}
+
+.algorithm-block .math {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: rgba(51, 255, 51, 0.03);
+}
+
+/* Enhanced Table Styles */
+.data-table {
+    width: 100%;
+    margin: 25px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: rgba(51, 255, 51, 0.05);
+    border: 1px solid var(--accent-color);
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--accent-color);
+    border-right: 1px solid var(--accent-color);
+}
+
+.data-table th {
+    background-color: rgba(51, 255, 51, 0.1);
+    color: var(--accent-color);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table td:last-child,
+.data-table th:last-child {
+    border-right: none;
+}
+
+.data-table tr:hover td {
+    background-color: rgba(51, 255, 51, 0.08);
+}
+
+.data-table .numeric {
+    font-family: var(--font-mono);
+    text-align: right;
+}
+
+/* Enhanced Code Block Styling */
+.code-block {
+    position: relative;
+    margin: 20px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: #1E1E1E;
+}
+
+.code-block::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 10px;
+    font-size: 12px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border-bottom-left-radius: 6px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 15px;
+    overflow-x: auto;
+    background-color: #1E1E1E;
+    border: none;
+    border-radius: 0;
+}
+
+.code-block code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    color: #D4D4D4;
+}
+
+/* Python Syntax Highlighting */
+.code-block[data-language="python"] .keyword,
+.code-block[data-language="python"] code .keyword {
+    color: #569CD6; /* blue for keywords */
+    font-weight: bold;
+}
+
+.code-block[data-language="python"] .function,
+.code-block[data-language="python"] code .function {
+    color: #DCDCAA; /* yellow for functions */
+}
+
+.code-block[data-language="python"] .string,
+.code-block[data-language="python"] code .string {
+    color: #CE9178; /* orange-red for strings */
+}
+
+.code-block[data-language="python"] .comment,
+.code-block[data-language="python"] code .comment {
+    color: #6A9955; /* green for comments */
+    font-style: italic;
+}
+
+.code-block[data-language="python"] .number,
+.code-block[data-language="python"] code .number {
+    color: #B5CEA8; /* light green for numbers */
+}
+
+.code-block[data-language="python"] .operator,
+.code-block[data-language="python"] code .operator {
+    color: #D4D4D4; /* white for operators */
+}
+
+.code-block[data-language="python"] .decorator,
+.code-block[data-language="python"] code .decorator {
+    color: #C586C0; /* purple for decorators */
+}
+
+/* Add a subtle line number effect */
+.code-block pre {
+    counter-reset: line;
+}
+
+.code-block pre code {
+    display: block;
+    position: relative;
+    padding-left: 3.5em;
+}
+
+.code-block pre code::before {
+    counter-increment: line;
+    content: counter(line);
+    position: absolute;
+    left: 0;
+    width: 2.5em;
+    color: #858585;
+    text-align: right;
+    padding-right: 0.5em;
+    border-right: 1px solid #404040;
+    user-select: none;
+}
+
+/* Add a subtle hover effect for code lines */
+.code-block pre code:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Adjust for mobile */
+@media (max-width: 768px) {
+    .code-block pre code {
+        padding-left: 2.5em;
+    }
+    
+    .code-block pre code::before {
+        width: 1.5em;
+    }
+}
+
+/* References styles */
+.references {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--accent-color);
+}
+
+.references ol {
+    list-style-type: none;
+    counter-reset: ref-counter;
+}
+
+.references ol li {
+    margin-bottom: 15px;
+    padding-left: 30px;
+    position: relative;
+}
+
+.references ol li::before {
+    counter-increment: ref-counter;
+    content: "[" counter(ref-counter) "]";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+}
+
+/* Results section styles */
+.results-section {
+    margin: 30px 0;
+    padding: 20px;
+    background-color: rgba(51, 255, 51, 0.05);
+    border: 1px solid var(--accent-color);
+}
+
+.results-header {
+    color: var(--accent-color);
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--accent-color);
+    padding-bottom: 5px;
+}
+
+/* Social links and disclaimer */
+.social-links {
+    margin-top: 20px;
+    padding: 10px 0;
+    border-top: 1px dashed var(--accent-color);
+}
+
+.social-links a {
+    margin-right: 15px;
+}
+
+.disclaimer {
+    margin-top: 20px;
+    padding: 10px 0;
+    font-size: 0.9em;
+    color: var(--accent-color);
+    border-top: 1px dashed var(--accent-color);
+} 

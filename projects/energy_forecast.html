@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Production - LSTM Forecasting</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="terminal-title">energy_forecast.html</div>
+        </div>
+        <div class="terminal-content">
+            <nav class="terminal-nav">
+                <a href="../index.html">Home</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../about.html">About</a>
+            </nav>
+
+            <div class="content">
+                <h1>Building an Energy Forecasting Dashboard with LSTM and Conformal Prediction Intervals</h1>
+
+                <div class="project-section">
+                    <p>In the world of renewable energy, accurately forecasting power production is vital for balancing supply with demand. Solar energy, for example, can vary significantly based on weather and time of day, making it inherently challenging to predict. To address this, we built a predictive dashboard using <strong>Long Short-Term Memory (LSTM)</strong> neural networks and <strong>conformal prediction intervals</strong> to forecast solar energy production with quantifiable uncertainty. This interactive dashboard is developed in <strong>Streamlit</strong>, allowing users to generate and view forecasts along with prediction intervals.</p>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">Project Overview</h2>
+                    <p>The goal of this project was to:</p>
+                    <ol>
+                        <li>Predict the next 24 hours of solar energy production using recent historical data.</li>
+                        <li>Provide a confidence interval around each prediction to help quantify the uncertainty, enabling more informed energy management.</li>
+                        <li>Develop a dashboard to visualize forecasts and interactively adjust parameters like confidence level.</li>
+                    </ol>
+
+                    <p>Our solution integrates three main components:</p>
+                    <ul>
+                        <li><strong>LSTM model</strong>: A deep learning model tailored for time series data, used here to forecast energy production.</li>
+                        <li><strong>Conformal prediction intervals</strong>: A non-parametric method to calculate uncertainty bounds based on historical residuals, providing a flexible way to add uncertainty without complex assumptions.</li>
+                        <li><strong>Streamlit dashboard</strong>: An easy-to-use web interface for generating and viewing forecasts.</li>
+                    </ul>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">1. How Conformal Predictions Work</h2>
+                    <p>Conformal prediction is a method used to create prediction intervals that are statistically valid, even for complex machine learning models. Unlike traditional methods that often assume a specific distribution of residuals, conformal prediction is <strong>distribution-free</strong> and based on a calibration process that provides uncertainty intervals.</p>
+
+                    <h3>Steps in Conformal Prediction</h3>
+                    <ol>
+                        <li>
+                            <strong>Calibration with Residuals</strong>:
+                            <p>Let's assume we have a trained model, \( f \), that predicts energy production based on recent data. We take a <strong>calibration set</strong> of historical data, which wasn't used during training, and calculate residuals between predictions and actual values:</p>
+                            <div class="math-block">
+                                \[ \text{residual}_i = |y_i - f(x_i)| \]
+                            </div>
+                            <p>where \( y_i \) is the actual production and \( f(x_i) \) is the model's forecast at time \( i \). These residuals give us a measure of how much error we typically see in predictions.</p>
+                        </li>
+                        <li>
+                            <strong>Quantile Calculation for Prediction Interval</strong>:
+                            <p>To form a prediction interval at a given confidence level \( 1 - \alpha \), we calculate quantiles of the residuals. For example, if we want a 95% confidence interval, we use the 97.5th quantile for the upper bound:</p>
+                            <div class="math-block">
+                                \[ q_{\text{upper}} = \text{Quantile}(\{\text{residual}_i\}, 1 - \alpha / 2) \]
+                            </div>
+                            <p>This quantile \( q_{\text{upper}} \) tells us the error threshold such that 95% of future residuals are expected to fall below this threshold.</p>
+                        </li>
+                        <li>
+                            <strong>Applying Prediction Intervals</strong>:
+                            <p>For each new forecasted value \( \hat{y}_{t+1} = f(x_{t+1}) \), we construct the prediction interval as:</p>
+                            <div class="math-block">
+                                \[ \left[ \hat{y}_{t+1} - q_{\text{upper}}, \hat{y}_{t+1} + q_{\text{upper}} \right] \]
+                            </div>
+                            <p>In practice, if the forecasted value minus the error quantile is negative (which could happen with production data that can't be negative), we clip it to zero.</p>
+                        </li>
+                    </ol>
+
+                    <h3>Why Conformal Prediction Works</h3>
+                    <p>Conformal prediction intervals are <strong>guaranteed to cover the true value \( y_{t+1} \)</strong> with probability \( 1 - \alpha \) under mild assumptions, thanks to its use of historical residuals rather than parametric assumptions. This method is particularly valuable in non-linear models like LSTMs, where residuals may not follow a normal distribution.</p>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">2. How LSTM Models Work for Time Series Forecasting</h2>
+                    <p><strong>Long Short-Term Memory (LSTM)</strong> networks are a type of Recurrent Neural Network (RNN) designed to capture long-term dependencies in sequential data. Traditional RNNs struggle with long sequences due to issues like vanishing gradients, but LSTMs overcome this by using a complex architecture with <strong>gates</strong> that control information flow.</p>
+
+                    <h3>LSTM Architecture</h3>
+                    <p>An LSTM cell consists of:</p>
+                    <ol>
+                        <li><strong>Cell State (\( c_t \))</strong>: The memory of the cell, which carries information across time steps.</li>
+                        <li><strong>Hidden State (\( h_t \))</strong>: The output of the cell at each time step, which serves as input to the next cell in the sequence.</li>
+                    </ol>
+
+                    <p>The flow of data in an LSTM cell is controlled by three types of gates:</p>
+
+                    <ol>
+                        <li>
+                            <strong>Forget Gate</strong> (\( f_t \)):
+                            <p>Controls how much of the previous cell state (\( c_{t-1} \)) should be retained:</p>
+                            <div class="math-block">
+                                \[ f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f) \]
+                            </div>
+                            <p>where \( \sigma \) is the sigmoid function, \( W_f \) are weights, and \( x_t \) is the input at time \( t \).</p>
+                        </li>
+                        <li>
+                            <strong>Input Gate</strong> (\( i_t \)) and Candidate Cell State (\( \tilde{c}_t \)):
+                            <p>Determines how much new information should be added to the cell state:</p>
+                            <div class="math-block">
+                                \[ i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i) \]
+                                \[ \tilde{c}_t = \tanh(W_c \cdot [h_{t-1}, x_t] + b_c) \]
+                            </div>
+                            <p>Here, \( i_t \) decides the amount of information to add, and \( \tilde{c}_t \) is the new candidate value.</p>
+                        </li>
+                        <li>
+                            <strong>Update Cell State</strong> (\( c_t \)):
+                            <p>Combines the forget and input gates to update the cell state:</p>
+                            <div class="math-block">
+                                \[ c_t = f_t \cdot c_{t-1} + i_t \cdot \tilde{c}_t \]
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Output Gate</strong> (\( o_t \)):
+                            <p>Controls what part of the cell state to output as the hidden state:</p>
+                            <div class="math-block">
+                                \[ o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o) \]
+                                \[ h_t = o_t \cdot \tanh(c_t) \]
+                            </div>
+                        </li>
+                    </ol>
+
+                    <h3>Using LSTM for Forecasting</h3>
+                    <p>In time series forecasting, an LSTM model is trained on sequences of past data (e.g., the last 72 hours) to predict future values (e.g., the next 24 hours). The LSTM effectively learns temporal patterns in the data, such as daily production cycles, allowing it to generalize these patterns for future forecasts.</p>
+
+                    <p>Given a trained LSTM model \( f \), we can use it to forecast:</p>
+                    <div class="math-block">
+                        \[ \hat{y}_{t+1}, \hat{y}_{t+2}, \ldots, \hat{y}_{t+24} = f(x_t) \]
+                    </div>
+                    <p>where \( x_t \) represents the sequence of inputs (historical production values) up to time \( t \).</p>
+
+                    <p>The LSTM's ability to retain information over long sequences makes it well-suited for energy production forecasting, where past data contains important cyclical patterns driven by time of day, weather, and other factors.</p>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">3. Visualizing Forecasts with Streamlit</h2>
+                    
+                    <div class="visualization">
+                        <img src="../plots/energy_streamlit.png" alt="Energy forecast dashboard" class="project-image">
+                        <p class="image-caption">Energy forecast dashboard</p>
+                    </div>
+
+                    <p>With the forecasting model and uncertainty intervals in place, we needed an interactive way to display results. <strong>Streamlit</strong> was the perfect choice: it's a Python framework designed for building data apps quickly and intuitively. Here's how we structured our Streamlit app:</p>
+
+                    <h3>App Features</h3>
+                    <ol>
+                        <li><strong>Date Selection</strong>: Users can select a forecast date, and the app will retrieve the necessary historical data.</li>
+                        <li><strong>Confidence Level Slider</strong>: Users can set the desired confidence level for the prediction intervals (e.g., 95%), giving control over the degree of uncertainty shown in the forecast.</li>
+                        <li><strong>Forecast Generation</strong>: When the user clicks "Generate Forecast," the app:
+                            <ul>
+                                <li>Fetches the most recent 72 hours of data for model input,</li>
+                                <li>Uses the LSTM model to predict the next 24 hours,</li>
+                                <li>Computes conformal prediction intervals to show upper and lower bounds.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Visualization</strong>: The app plots the last 72 hours of historical production data, the 24-hour forecast, and shaded areas representing the prediction intervals. A dashed vertical line indicates where historical data ends and the forecast begins.</li>
+                    </ol>
+
+                    <h3>Code Example: Generating the Forecast in Streamlit</h3>
+                    <p>Here's a simplified snippet showing the key steps in generating the forecast and displaying it in Streamlit:</p>
+
+                    <div class="code-block" data-language="python">
+                        <pre><code># Select forecast date and confidence level in Streamlit
+forecast_date = st.date_input(
+    "Select Forecast Date",
+    datetime.date.today()
+)
+confidence_level = st.slider(
+    "Confidence Level",
+    0.80, 0.99, 0.95
+)
+
+if st.button("Generate Forecast"):
+    with st.spinner("Generating forecast..."):
+        # Fetch calibration data and calculate residuals
+        calibration_data = get_calibration_data()
+        residuals = calculate_residuals_for_conformal(
+            model,
+            calibration_data
+        )
+
+        # Generate forecast with conformal intervals
+        forecast_df, historical_data = make_conformal_forecast(
+            model,
+            forecast_date,
+            residuals,
+            alpha=1-confidence_level
+        )
+
+        # Plotting
+        fig, ax = plt.subplots(figsize=(14, 7))
+        
+        # Plot historical data
+        ax.plot(
+            historical_data.index[-72:],
+            historical_data['Production_MWh'][-72:],
+            label='Last 72 Hours'
+        )
+        
+        # Plot forecast
+        ax.plot(
+            forecast_df.index,
+            forecast_df['Forecasted_Production_MWh'],
+            label='Forecast',
+            color='red',
+            linestyle='--'
+        )
+        
+        # Add prediction intervals
+        ax.fill_between(
+            forecast_df.index,
+            forecast_df['Lower_Bound'],
+            forecast_df['Upper_Bound'],
+            color='pink',
+            alpha=0.3,
+            label=f'{int(confidence_level * 100)}% Prediction Interval'
+        )
+        
+        # Add forecast start line
+        ax.axvline(
+            x=forecast_df.index[0],
+            color='gray',
+            linestyle='--',
+            label='Forecast Start'
+        )
+        
+        ax.legend()
+        st.pyplot(fig)</code></pre>
+                    </div>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">4. Results and Insights</h2>
+                    <p>Our app provides an intuitive interface for exploring 24-hour energy production forecasts with confidence intervals. Users can adjust the confidence level to see how the prediction interval widens or narrows, directly illustrating the trade-off between certainty and interval width. This is especially useful for energy managers who need reliable production forecasts to plan resources and maintain grid stability.</p>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">5. Key Takeaways</h2>
+                    <ol>
+                        <li><strong>LSTM Models for Time Series</strong>: LSTMs are effective at capturing patterns in sequential data, making them ideal for time series forecasting tasks like energy production.</li>
+                        <li><strong>Conformal Prediction for Uncertainty Quantification</strong>: Conformal prediction intervals are a practical way to add uncertainty to forecasts, providing an interpretable range around each prediction.</li>
+                        <li><strong>Streamlit for Data Apps</strong>: Streamlit's ease of use and flexibility make it an excellent choice for quickly deploying interactive data applications.</li>
+                    </ol>
+                </div>
+
+                <div class="project-section">
+                    <h2 class="section-header">6. Future Directions</h2>
+                    <p>We plan to extend this dashboard with:</p>
+                    <ul>
+                        <li><strong>Additional Forecast Horizons</strong>: Allowing users to select different forecast horizons (e.g., 6, 12, 48 hours).</li>
+                        <li><strong>Incorporating Weather Data</strong>: Adding weather forecasts to the model input to improve prediction accuracy.</li>
+                        <li><strong>Further Model Optimization</strong>: Experimenting with more complex architectures, such as stacked LSTMs or transformers, to enhance forecast precision.</li>
+                    </ul>
+
+                    <p>This project demonstrates how LSTMs and conformal prediction intervals can be combined to build a powerful, interpretable forecasting tool, with Streamlit enabling straightforward deployment for end-users. Whether you're an energy manager or a data scientist, this framework provides a reliable, scalable way to explore and visualize future energy production with uncertainty bounds.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/main.js"></script>
+</body>
+</html> 
